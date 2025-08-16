@@ -1,0 +1,63 @@
+#In this SQL, I'm querying a database with multiple tables in it to quantify statistics about customer and order data.
+
+-- Question #1
+-- How many many unique orders were placed in January? In other words, how many distinct order ids do we have?
+SELECT COUNT(DISTINCT orderID)
+FROM JanSales
+WHERE length(orderID) = 6 AND orderID <> 'Order ID'
+;
+
+-- Question #2
+-- How many of those orders were for an iPhone?
+SELECT COUNT(DISTINCT orderID)
+FROM JanSales
+WHERE length(orderID) = 6 AND orderID <> 'Order ID'
+AND Product = 'iPhone'
+;    
+
+-- Question #3
+-- Select the customer account numbers for all the orders that were placed in February.
+SELECT c.acctnum
+FROM customers c
+JOIN ( SELECT DISTINCT orderID
+        FROM FebSales
+        WHERE length(orderID) = 6 AND orderID <> 'Order ID'
+    ) feb
+ON c.order_id = feb.orderID
+;
+
+-- Question #4
+-- Which product was the cheapest one sold in January, and what was the price?
+SELECT DISTINCT product
+,price
+FROM JanSales
+ORDER BY price
+LIMIT 1
+;
+
+-- Question #5
+-- What is the total revenue for each product sold in January?
+SELECT product
+,ROUND(SUM(quantity) * price, 2) total_revenue
+FROM JanSales
+GROUP BY product
+;
+
+-- Question #6
+-- Which products were sold in February at 548 Lincoln St, Seattle, WA 98101, how many of each were sold, and what was the total revenue?
+SELECT product
+,quantity
+,SUM(quantity) * price revenvue
+FROM FebSales
+WHERE location = '548 Lincoln St, Seattle, WA 98101'
+GROUP BY product
+;
+
+-- Question #7
+-- How many customers ordered more than 2 products at a time in February, and what was the average amount spent for those customers?
+SELECT COUNT(c.acctnum) customers
+,AVG(fs.quantity * fs.price) average_spent
+FROM customers c
+JOIN FebSales fs ON c.order_id = fs.orderID
+WHERE fs.quantity > 2 AND length(c.order_id) = 6 AND c.order_id <> 'Order ID'
+;
