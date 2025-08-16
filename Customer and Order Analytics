@@ -61,3 +61,12 @@ FROM customers c
 JOIN FebSales fs ON c.order_id = fs.orderID
 WHERE fs.quantity > 2 AND length(c.order_id) = 6 AND c.order_id <> 'Order ID'
 ;
+
+-- List all the products sold in Los Angeles in February, and include how many of each were sold.
+SELECT product
+,SUM(quantity) total
+FROM FebSales
+WHERE location like '%los angeles%'
+GROUP BY product
+ORDER BY total DESC
+;
