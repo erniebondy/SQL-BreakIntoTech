@@ -1,0 +1,122 @@
+-- 1. Show Customers (their full names, customer ID, and country) who are not in the US.
+SELECT customerid
+,firstname
+,lastname
+,country FROM customers
+WHERE country <> 'USA'
+;
+
+-- 2. Show only the Customers from Brazil.
+SELECT customerid
+,firstname
+,lastname
+,country FROM customers
+WHERE country = 'Brazil'
+;
+
+-- 3. Find the Invoices of customers who are from Brazil. 
+--    The resulting table should show the customer's full name, Invoice ID, Date of the invoice, and billing country.
+SELECT c.firstname
+,c.lastname
+,i.invoiceID
+,i.invoiceDate
+,i.billingCountry
+FROM customers c
+JOIN invoices i ON c.customerID = i.customerID
+WHERE c.country = 'Brazil'
+;
+
+-- 4. Show the Employees who are Sales Agents.
+SELECT * FROM employees
+WHERE title = 'Sales Support Agent'
+;
+
+-- 5. Find a unique/distinct list of billing countries from the Invoice table.
+SELECT DISTINCT billingCountry
+FROM invoices
+;
+
+-- 6. Provide a query that shows the invoices associated with each sales agent. The resulting table should include the Sales Agent's full name.
+SELECT i.invoiceID
+,e.firstname
+,e.lastname
+FROM employees e
+JOIN customers c ON e.employeeID = c.supportRepID
+JOIN invoices i ON c.customerID = i.customerID
+;
+
+-- 7. Show the Invoice Total, Customer name, Country, and Sales Agent name for all invoices and customers.
+SELECT i.invoiceID
+,i.total     invoice_total
+,c.firstname cust_firstname
+,c.lastname  cust_lastname
+,e.firstname emp_firstname
+,e.lastname  emp_lastname
+FROM employees e
+JOIN customers c ON e.employeeID = c.supportRepID
+JOIN invoices i ON c.customerID = i.customerID
+;
+
+-- 8. How many Invoices were there in 2009?
+SELECT COUNT(invoiceID) invoices_in_2009
+FROM invoices
+WHERE invoiceDate LIKE '2009-%'
+;
+
+-- 9. What are the total sales for 2009?
+SELECT SUM(total) total_sales_2009
+FROM invoices
+WHERE invoiceDate LIKE '2009-%'
+;
+
+-- 10. Write a query that includes the purchased track name with each invoice line ID.
+SELECT ii.invoiceLineID
+,t.name track_name
+FROM invoice_items ii
+JOIN tracks t ON ii.trackID = t.trackID
+;
+
+-- 11. Write a query that includes the purchased track name AND artist name with each invoice line ID.
+SELECT ii.invoiceLineID
+,t.name track_name
+,a.name artist
+FROM invoice_items ii
+JOIN tracks t ON ii.trackID = t.trackID
+JOIN albums al ON t.albumID = al.albumID
+JOIN artists a ON al.artistID = a.artistID
+;
+
+-- 12. Provide a query that shows all the Tracks, and include the Album name, Media type, and Genre.
+SELECT t.name track
+,a.title album
+,mt.name media_type
+,g.name  genre
+FROM tracks t
+JOIN albums a ON t.albumID = a.albumID
+JOIN media_types mt ON t.mediaTypeID = mt.mediaTypeID
+JOIN genres g ON t.genreID = g.genreID
+;
+
+-- 13. Show the total sales made by each sales agent.
+SELECT e.firstname
+,e.lastname
+,SUM(i.total) total_sales
+FROM employees e
+JOIN customers c ON e.employeeID = c.supportRepID
+JOIN invoices i ON c.customerID = i.customerID
+WHERE e.title = 'Sales Support Agent'
+GROUP BY e.firstname, e.lastname
+;
+
+-- 14. Which sales agent made the most dollars in sales in 2009?
+SELECT e.firstname
+,e.lastname
+,SUM(i.total) total
+FROM employees e
+JOIN customers c ON e.employeeID = c.supportRepID
+JOIN invoices i ON c.customerID = i.customerID
+WHERE i.invoiceDate LIKE '2009-%'
+GROUP BY e.firstname, e.lastname
+ORDER BY total DESC
+LIMIT 1
+;
